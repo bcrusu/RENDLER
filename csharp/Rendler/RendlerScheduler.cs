@@ -30,8 +30,8 @@ namespace Rendler
         private readonly ConcurrentQueue<string> _renderQueue = new ConcurrentQueue<string>();
         private readonly ISet<string> _crawled = new HashSet<string>();
 
-        private readonly ConcurrentDictionary<string, string> _urlToFileMap = new ConcurrentDictionary<string, string>();
-        private readonly ConcurrentDictionary<string, List<string>> _edgesMap = new ConcurrentDictionary<string, List<string>>();
+		private readonly ConcurrentDictionary<string, string> _renderResults = new ConcurrentDictionary<string, string>();
+		private readonly ConcurrentDictionary<string, List<string>> _crawlResults = new ConcurrentDictionary<string, List<string>>();
 
         public RendlerScheduler(string startUrl, string outputDir, 
 			string runAsUser = null)
@@ -107,7 +107,7 @@ namespace Rendler
                     Console.WriteLine("Reached the max number of tasks to run. Stopping...");
 
                     var dotWritePath = Path.Combine(_outputDir, "result.dot");
-                    DotHelper.Write(dotWritePath, _edgesMap, _urlToFileMap);
+					DotHelper.Write(dotWritePath, _crawlResults, _renderResults);
                     driver.Stop();
                 }
             }
@@ -134,18 +134,18 @@ namespace Rendler
 				}
 
                 // update edges: url -> links
-				var edges = _edgesMap.GetOrAdd (crawlResult.Url, x => new List<string> ());
+				var edges = _crawlResults.GetOrAdd (crawlResult.Url, x => new List<string> ());
 				edges.AddRange (crawlResult.Links);
 
                 // empty edge list for links
 				foreach (var link in crawlResult.Links)
-					_edgesMap.GetOrAdd (link, x => new List<string> ());
+					_crawlResults.GetOrAdd (link, x => new List<string> ());
 				break;
 			case "RenderResult":
 				var renderResult = JsonHelper.Deserialize<RenderResultMessage> (message.Body);
 				Console.WriteLine ($"Framework message <RenderResult>: saved '{renderResult.FileName}' for url '{renderResult.Url}'.");
 
-				_urlToFileMap [renderResult.Url] = renderResult.FileName;
+				_renderResults [renderResult.Url] = renderResult.FileName;
 				break;
 			default:
 				Console.WriteLine ($"Unrecognized message type: '{message.Type}'");

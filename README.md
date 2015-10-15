@@ -39,12 +39,13 @@ You can see that 1 slave is registered and you've got some idle CPUs and Memory.
 ### Run RENDLER in the `mesos-demo` VM
 
 Check implementations of the RENDLER scheduler in the `python`, `go`,
-`scala`, and `cpp` directories. Run instructions are here:
+`scala`, `cpp` and `csharp` directories. Run instructions are here:
 
 - [Python RENDLER framework](python/README.md)
 - [Go RENDLER framework](go/README.md)
 - [Scala RENDLER framework](scala/README.md)
 - [C++ RENDLER framework](cpp/README.md)
+- [C# RENDLER framework](csharp/README.md)
 
 Feel free to contribute your own!
 

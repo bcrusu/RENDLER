@@ -21,19 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Commandlineparameters>-scheduler -master=127.0.0.50:5050 -user=bcrusu -output=/tmp/rendlerout</Commandlineparameters>
-    <CustomCommands>
-      <CustomCommands>
-        <Command type="AfterBuild" command="cp -u ../native/Debug/libmesosclr.so ${TargetDir}" workingdir="${SolutionDir}" />
-      </CustomCommands>
-    </CustomCommands>
-    <EnvironmentVariables>
-      <EnvironmentVariables>
-        <Variable name="LD_LIBRARY_PATH" value="/home/bcrusu/work/github/mesos-clr/src/native/Debug:/home/bcrusu/work/github/mesos/build/src/.libs:${LD_LIBRARY_PATH}" />
-        <Variable name="MONO_LOG_LEVEL" value="debug" />
-        <Variable name="MONO_LOG_MASK" value="dll" />
-      </EnvironmentVariables>
-    </EnvironmentVariables>
     <ConsolePause>false</ConsolePause>
     <LangVersion>6</LangVersion>
   </PropertyGroup>
@@ -48,10 +35,6 @@
     <LangVersion>6</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mesosclr, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\mesos-clr\src\main\mesosclr\bin\Debug\mesosclr.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -59,6 +42,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67">
       <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="mesosclr">
+      <HintPath>..\..\..\mesos-clr\src\main\mesosclr\bin\Debug\mesosclr.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

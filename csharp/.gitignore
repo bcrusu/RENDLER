@@ -1,4 +1,10 @@
+*.suo
+*.user
+*.sdf
+*.userprefs
 .vs
 packages
 Rendler/bin
 Rendler/obj
+
+
