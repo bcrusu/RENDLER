@@ -9,7 +9,7 @@
 
 To start the Rendler framework, run the command: 
 ```bash
-mono rendler.exe -scheduler -master=MASTER_ADDRESS -output=RENDLER_OUTPUT_DIR [-user=RUN_AS_USER]
+mono rendler.exe -scheduler -master=MASTER_ADDRESS -output=RENDLER_OUTPUT_DIR [-starturl=CRAWL_START_URL] [-user=RUN_AS_USER]
 ```
 
 
