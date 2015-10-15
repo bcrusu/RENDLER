@@ -1,4 +1,0 @@
-C# Rendler Framework
-========
-
-TODO

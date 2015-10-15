@@ -6,5 +6,6 @@
 packages
 Rendler/bin
 Rendler/obj
-
+ext/mesosclr.dll
+ext/libmesosclr.so
 

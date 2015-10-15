@@ -1,0 +1,3 @@
+directory containing the mesos-clr binaries required to build Rendler
+- mesosclr.dll
+- libmesosclr.so

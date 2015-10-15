@@ -44,7 +44,7 @@
       <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="mesosclr">
-      <HintPath>..\..\..\mesos-clr\src\main\mesosclr\bin\Debug\mesosclr.dll</HintPath>
+      <HintPath>..\ext\mesosclr.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +69,10 @@
   <ItemGroup>
     <Content Include="..\..\render.js">
       <Link>render.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ext\libmesosclr.so">
+      <Link>libmesosclr.so</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
