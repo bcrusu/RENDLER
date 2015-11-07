@@ -9,7 +9,7 @@ function parse(argsArray) {
     argsArray.forEach(function (arg) {
         if (arg.indexOf("-executor=") === 0) {
             if (runMode !== undefined) {
-                console.write("Invalid run mode detected. Check the 'executor' argument!");
+                console.log("Invalid run mode detected. Check the 'executor' argument!");
                 return null;
             }
 
@@ -18,7 +18,7 @@ function parse(argsArray) {
         }
         else if (arg.indexOf("-scheduler") === 0) {
             if (runMode !== undefined) {
-                console.write("Invalid run mode detected. Check the 'scheduler' argument!");
+                console.log("Invalid run mode detected. Check the 'scheduler' argument!");
                 return null;
             }
 
@@ -26,7 +26,7 @@ function parse(argsArray) {
         }
         else if (arg.indexOf("-master=") === 0) {
             if (mesosMaster !== undefined) {
-                console.write("Mesos master option can be specified only once.");
+                console.log("Mesos master option can be specified only once.");
                 return null;
             }
 
@@ -34,7 +34,7 @@ function parse(argsArray) {
         }
         else if (arg.indexOf("-output=") === 0) {
             if (outputDir !== undefined) {
-                console.write("Output directory option can be specified only once.");
+                console.log("Output directory option can be specified only once.");
                 return null;
             }
 
@@ -42,7 +42,7 @@ function parse(argsArray) {
         }
         else if (arg.indexOf("-starturl=") === 0) {
             if (startUrl !== undefined) {
-                console.write("Start URL option can be specified only once.");
+                console.log("Start URL option can be specified only once.");
                 return null;
             }
 
@@ -50,11 +50,14 @@ function parse(argsArray) {
         }
         else if (arg.indexOf("-user=") === 0) {
             if (runAsUser !== undefined) {
-                console.write("User option can be specified only once.");
+                console.log("User option can be specified only once.");
                 return null;
             }
 
             runAsUser = arg.substring("-user=".length);
+        }
+        else {
+            console.log("Unknown argument detected: " + arg);
         }
     });
 
@@ -72,27 +75,27 @@ function validate(arguments) {
     switch (arguments.runMode) {
         case "executor":
             if (!arguments.executorName) {
-                console.write("Invalid executor name.");
+                console.log("Invalid executor name.");
                 return false;
             }
             break;
         case "scheduler" :
             if (!arguments.mesosMaster) {
-                console.write("Invalid Mesos master address.");
+                console.log("Invalid Mesos master address.");
                 return false;
             }
             if (!arguments.outputDir) {
-                console.write("Invalid output directory.");
+                console.log("Invalid output directory.");
                 return false;
             }
 
             if (!directoryExists(arguments.outputDir)) {
-                console.write("Could not find output directory.");
+                console.log("Could not find output directory.");
                 return false;
             }
             break;
         default :
-            console.write("Run mode was not specified.");
+            console.log("Run mode was not specified.");
             return false;
     }
     return true;

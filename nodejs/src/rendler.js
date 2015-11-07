@@ -1,24 +1,48 @@
-var args = require("./arguments.js");
-var mesosApi = require('mesosApi')(0);
+var Arguments = require("./arguments.js");
+const MesosApi = require('mesosApi')(0);
+const Protos = MesosApi.protos.mesos;
+const RendlerScheduler = require('./rendlerScheduler.js');
 
 function main() {
-    var arguments = args.parse(process.argv);
-    if (!arguments || !args.validate(args))
-        return -1;
+    var args = Arguments.parse(process.argv.slice(2));
+    if (!args || !Arguments.validate(args))
+        return;
 
-    switch (arguments.runMode) {
+    switch (args.runMode) {
         case "executor":
-            return runExecutor(arguments.executorName);
+            runExecutor(args.executorName);
+            break;
         case "scheduler" :
-            return runScheduler(arguments.mesosMaster, arguments.startUrl, arguments.outputDir, arguments.runAsUser);
-        default:
-            return -1;
+            runScheduler(args.mesosMaster, args.startUrl, args.outputDir, args.runAsUser);
+            break;
     }
 }
 
 function runScheduler(mesosMaster, startUrl, outputDir, runAsUser) {
-    //TODO:
-    return -1;
+    var frameworkInfo = new Protos.FrameworkInfo({
+        id: {
+            value: "Rendler"
+        },
+        name: "Rendler (Node.js)",
+        failover_timeout: 5,  //seconds
+        checkpoint: false,
+        user: runAsUser
+    });
+
+    if (!startUrl)
+        startUrl = "https://mesosphere.com";
+
+    var scheduler = new RendlerScheduler(startUrl, outputDir, runAsUser);
+    var driver = MesosApi.createSchedulerDriver(scheduler, frameworkInfo, mesosMaster);
+
+    console.log("Running scheduler driver...");
+    driver.run()
+        .then(function (status) {
+           console.log("Scheduler driver finished with status: " + status);
+        })
+        .catch(function (error) {
+            console.log("Unexpected error: " + error);
+        });
 }
 
 function runExecutor(executorName) {
