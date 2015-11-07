@@ -99,7 +99,7 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
                         })
                     ]
                 }),
-                data: ByteBuffer.fromUTF8(_outputDir)
+                data: ByteBuffer.fromUTF8(outputDir)
             }),
             data: ByteBuffer.fromUTF8(url)
         });
