@@ -2,6 +2,7 @@ const util = require('util');
 const MesosApi = require('mesosApi')(0);
 const Protos = MesosApi.protos.mesos;
 const EventEmitter = require('events');
+const ByteBuffer = require('bytebuffer');
 
 const MaxTasksToRun = 256; // limit for demonstration purpose
 const RenderCpus = 1;
@@ -12,8 +13,8 @@ const CrawlMem = 64;
 function RendlerScheduler(startUrl, outputDir, runAsUser) {
     EventEmitter.call(this);
 
-    var _renderQueue = [ startUrl ];
-    var _crawlQueue = [ startUrl ];
+    var _renderQueue = [startUrl];
+    var _crawlQueue = [startUrl];
     var _crawled = [];
     var _launchedTasks = 0;
 
@@ -22,8 +23,7 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
     }
 
     function onResourceOffers(driver, offers) {
-        for (var i = 0; i < offers.length; i++)
-        {
+        for (var i = 0; i < offers.length; i++) {
             var offer = offers[i];
             var tasks = [];
             var resourcesCounter = new ResourcesCounter(offer);
@@ -33,16 +33,14 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
                 done = true;
 
                 var renderUrl = _renderQueue.pop();
-                if (renderUrl && resourcesCounter.hasRenderTaskResources())
-                {
+                if (renderUrl && resourcesCounter.hasRenderTaskResources()) {
                     tasks.push(getRenderTaskInfo(offer, ++_launchedTasks, renderUrl));
                     resourcesCounter.subtractRenderResources();
                     done = false;
                 }
 
                 var crawlUrl = _crawlQueue.pop();
-                if (crawlUrl && resourcesCounter.hasCrawlTaskResources())
-                {
+                if (crawlUrl && resourcesCounter.hasCrawlTaskResources()) {
                     tasks.push(getCrawlTaskInfo(offer, ++_launchedTasks, crawlUrl));
                     resourcesCounter.subtractCrawlResources();
                     _crawled.push(crawlUrl);
@@ -51,7 +49,7 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
             } while (!done);
 
             if (tasks.length > 0) {
-                driver.launchTasks ([offer.id], tasks);
+                driver.launchTasks([offer.id], tasks);
             }
             else
                 driver.declineOffer(offer.id);
@@ -70,26 +68,25 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
         console.log("Error: " + message);
     }
 
-    function getRenderTaskInfo(offer, uniqueId, url)
-    {
+    function getRenderTaskInfo(offer, uniqueId, url) {
         return new Protos.TaskInfo({
             name: "Rendler.Render_" + uniqueId,
-            task_id: new Protos.TaskID({ value: uniqueId.toString() }),
+            task_id: new Protos.TaskID({value: uniqueId.toString()}),
             slave_id: offer.slave_id,
             resources: [
                 new Protos.Resource({
                     name: "cpus",
                     type: Protos.Value.Type.SCALAR,
-                    scalar: new Protos.Value.Scalar({ value: RenderCpus })
-                 }),
+                    scalar: new Protos.Value.Scalar({value: RenderCpus})
+                }),
                 new Protos.Resource({
                     name: "mem",
                     type: Protos.Value.Type.SCALAR,
-                    scalar: new Protos.Value.Scalar({ value: RenderMem })
+                    scalar: new Protos.Value.Scalar({value: RenderMem})
                 })
             ],
             executor: new Protos.ExecutorInfo({
-                executor_id: new Protos.ExecutorID({ value: "RenderExecutor" }),
+                executor_id: new Protos.ExecutorID({value: "RenderExecutor"}),
                 command: new Protos.CommandInfo({
                     value: "mono rendler.exe -executor=render",  //TODO
                     user: runAsUser,
@@ -102,32 +99,31 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
                         })
                     ]
                 }),
-                data: "" //TODO: Encoding.UTF8.GetBytes (_outputDir)
+                data: ByteBuffer.fromUTF8(_outputDir)
             }),
-            data: "" //TODO: Encoding.UTF8.GetBytes (url)
+            data: ByteBuffer.fromUTF8(url)
         });
     }
 
-    function getCrawlTaskInfo(offer, uniqueId, url)
-    {
+    function getCrawlTaskInfo(offer, uniqueId, url) {
         return new Protos.TaskInfo({
             name: "Rendler.Crawl_" + uniqueId,
-            task_id: new Protos.TaskID({ value: uniqueId.toString() }),
+            task_id: new Protos.TaskID({value: uniqueId.toString()}),
             slave_id: offer.slave_id,
             resources: [
                 new Protos.Resource({
                     name: "cpus",
                     type: Protos.Value.Type.SCALAR,
-                    scalar: new Protos.Value.Scalar({ value: CrawlCpus })
+                    scalar: new Protos.Value.Scalar({value: CrawlCpus})
                 }),
                 new Protos.Resource({
                     name: "mem",
                     type: Protos.Value.Type.SCALAR,
-                    scalar: new Protos.Value.Scalar({ value: CrawlMem })
+                    scalar: new Protos.Value.Scalar({value: CrawlMem})
                 })
             ],
             executor: new Protos.ExecutorInfo({
-                executor_id: new Protos.ExecutorID({ value: "CrawlExecutor" }),
+                executor_id: new Protos.ExecutorID({value: "CrawlExecutor"}),
                 command: new Protos.CommandInfo({
                     value: "mono rendler.exe -executor=crawl",  //TODO
                     user: runAsUser,
@@ -141,12 +137,11 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
                     ]
                 }),
             }),
-            data: "" //TODO: Encoding.UTF8.GetBytes (url)
+            data: ByteBuffer.fromUTF8(url)
         });
     }
 
-    function ResourcesCounter(offer)
-    {
+    function ResourcesCounter(offer) {
         var _cpus = 0;
         var _mem = 0;
 
@@ -158,34 +153,32 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
         if (memResource)
             _mem = memResource.scalar.value;
 
-        function getResource(name){
-            return offer.resources.find(function (r){
+        function getResource(name) {
+            return offer.resources.find(function (r) {
                 return r.name === name;
             });
         }
 
-        function subtract(cpus, mem)
-        {
+        function subtract(cpus, mem) {
             _cpus = _cpus - cpus;
             _mem = _mem - mem;
         }
 
-        function hasResources(cpus, mem)
-        {
+        function hasResources(cpus, mem) {
             return _cpus >= cpus && _mem >= mem;
         }
 
         var result = {};
 
-        result.hasRenderTaskResources = function() {
+        result.hasRenderTaskResources = function () {
             return hasResources(RenderCpus, RenderMem);
         };
 
-        result.hasCrawlTaskResources = function() {
+        result.hasCrawlTaskResources = function () {
             return hasResources(CrawlCpus, CrawlMem);
         };
 
-        result.subtractRenderResources = function() {
+        result.subtractRenderResources = function () {
             subtract(RenderCpus, RenderMem);
         };
 

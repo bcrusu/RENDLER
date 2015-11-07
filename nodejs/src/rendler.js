@@ -1,7 +1,7 @@
-var Arguments = require("./arguments.js");
+var Arguments = require("./arguments");
 const MesosApi = require('mesosApi')(0);
 const Protos = MesosApi.protos.mesos;
-const RendlerScheduler = require('./rendlerScheduler.js');
+const RendlerScheduler = require('./rendlerScheduler');
 
 function main() {
     var args = Arguments.parse(process.argv.slice(2));

@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "mesosApi": ">0.0.0"
+    "mesosApi": ">0.0.0",
+    "bytebuffer": "~4 >=4.1"
   }
 }

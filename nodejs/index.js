@@ -1,2 +1,2 @@
-var rendler = require("./src/rendler.js");
+var rendler = require("./src/rendler");
 rendler.main();
