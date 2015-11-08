@@ -104,7 +104,7 @@ function validate(arguments) {
 function directoryExists(directory) {
     var fs = require("fs");
     try {
-        stats = fs.statSync(directory);
+        var stats = fs.statSync(directory);
         if (!stats.isDirectory()) {
             return false;
         }

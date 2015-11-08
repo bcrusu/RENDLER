@@ -20,7 +20,7 @@ function CrawlExecutor() {
 
         var httpx = getHttpObject(url);
         if (!httpx) {
-            console.log("Unrecognized url protocol: " + url);
+            console.log("Unrecognized protocol for url: " + url);
             executorUtil.sendTaskFinishedStatus(driver, taskInfo.task_id);
             return;
         }
@@ -76,7 +76,7 @@ function CrawlExecutor() {
         var array;
         while ((array = regex.exec(content)) !== null) {
             var link = array[1];
-            links.push(link);
+            links.push(link.toLowerCase());
         }
 
         return links;

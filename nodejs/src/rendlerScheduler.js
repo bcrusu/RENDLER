@@ -1,4 +1,5 @@
 const util = require('util');
+const path = require('path');
 const MesosApi = require('mesosApi')(0);
 const Protos = MesosApi.protos.mesos;
 const EventEmitter = require('events');
@@ -17,6 +18,10 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
     var _crawlQueue = [startUrl];
     var _crawled = [];
     var _launchedTasks = 0;
+    var _finishedTasksCount = 0;
+
+    var _renderResults = {};
+    var _crawlResults = {};
 
     function onRegistered(driver, frameworkId, masterInfo) {
         console.log("Registered with Mesos master. FrameworkId=" + frameworkId.value);
@@ -57,11 +62,64 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
     }
 
     function onStatusUpdate(driver, status) {
-        //TODO:
+        if (!isTerminalTaskState(status.state)) {
+            console.log("Status update: task " + status.task_id.value + " is in state " + status.state);
+            return;
+        }
+
+        console.log("Status update: task " + status.task_id.value + " has terminated with state " + status.state);
+
+        if (++_finishedTasksCount == MaxTasksToRun) {
+            console.log("Reached the max number of tasks to run. Stopping...");
+
+            var dotWritePath = path.join(outputDir, "result.dot");
+            //TODO: write DOT file
+            driver.stop();
+        }
     }
 
     function onFrameworkMessage(driver, executorId, slaveId, data) {
-        //TODO:
+        var url = undefined;
+        var message = JSON.parse(data);
+
+        switch (message.type) {
+            case "CrawlResult":
+                url = message.body.url;
+                var links = message.body.links;
+                console.log("Framework message 'CrawlResult': got " + links.length + " links from url " + url);
+
+                links
+                    .filter(function (link) {
+                        return !_crawled.some(function (crawledLink) {
+                            return crawledLink === link;
+                        });
+                    })
+                    .forEach(function (link) {
+                        _crawlQueue.push(link);
+                        _renderQueue.push(link);
+                    });
+
+                // update edges: url -> links
+                var edges = _crawlResults[url] || [];
+                _crawlResults[url] = edges.concat(links);
+
+                // empty edge list for links
+                links.forEach(function (link) {
+                    if (!(link in _crawlResults))
+                        _crawlResults[link] = [];
+                });
+                break;
+            case "RenderResult":
+                url = message.body.url;
+                var fileName = message.body.fileName;
+                console.log("Framework message 'RenderResult': saved " + fileName + " for url " + url);
+
+                _renderResults[url] = fileName;
+                break;
+            default:
+                console.log("Unrecognized message type: " + message.type);
+                break;
+        }
     }
 
     function onError(driver, message) {
@@ -135,7 +193,7 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
                             executable: false
                         })
                     ]
-                }),
+                })
             }),
             data: ByteBuffer.fromUTF8(url)
         });
@@ -187,6 +245,14 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
         };
 
         return result;
+    }
+
+    function isTerminalTaskState(taskState) {
+        return taskState === Protos.TaskState.TASK_FINISHED ||
+            taskState === Protos.TaskState.TASK_FAILED ||
+            taskState === Protos.TaskState.TASK_KILLED ||
+            taskState === Protos.TaskState.TASK_LOST ||
+            taskState === Protos.TaskState.TASK_ERROR;
     }
 
     this.on("registered", onRegistered);

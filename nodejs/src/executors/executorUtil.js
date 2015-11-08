@@ -21,11 +21,3 @@ exports.sendTaskErrorStatus = function (driver, taskId) {
         state: Protos.TaskState.TASK_ERROR
     }));
 };
-
-exports.isTerminalTaskState = function (taskState) {
-    return taskState === Protos.TaskState.TASK_FINISHED ||
-        taskState === Protos.TaskState.TASK_FAILED ||
-        taskState === Protos.TaskState.TASK_KILLED ||
-        taskState === Protos.TaskState.TASK_LOST ||
-        taskState === Protos.TaskState.TASK_ERROR;
-};
