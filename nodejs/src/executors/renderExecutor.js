@@ -40,7 +40,7 @@ function RenderExecutor() {
     }
 
     function sendRenderResultMessage(driver, url, fileName) {
-        var message = new {
+        var message = {
             type: "RenderResult",
             body: {
                 url: url,

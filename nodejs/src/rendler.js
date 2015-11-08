@@ -1,12 +1,14 @@
 var Arguments = require("./arguments");
-const MesosApi = require('mesosApi')(0);
+const MesosApi = require("mesos-api")(0);
 const Protos = MesosApi.protos.mesos;
-const RendlerScheduler = require('./rendlerScheduler');
+const RendlerScheduler = require("./rendlerScheduler");
+const CrawlExecutor = require("./executors/crawlExecutor");
+const RenderExecutor = require("./executors/renderExecutor");
 
 function main() {
     var args = Arguments.parse(process.argv.slice(2));
     if (!args || !Arguments.validate(args))
-        return;
+        process.exit(-1);
 
     switch (args.runMode) {
         case "executor":
@@ -38,16 +40,43 @@ function runScheduler(mesosMaster, startUrl, outputDir, runAsUser) {
     console.log("Running scheduler driver...");
     driver.run()
         .then(function (status) {
-           console.log("Scheduler driver finished with status: " + status);
+            console.log("Scheduler driver finished with status: " + status);
+            process.exit(0);
         })
         .catch(function (error) {
-            console.log("Unexpected error: " + error);
+            console.log("Unexpected driver error: " + error);
+            process.exit(-2);
         });
 }
 
 function runExecutor(executorName) {
-    //TODO:
-    return -1;
+    var executor;
+    switch (executorName) {
+        case "render":
+            executor = new RenderExecutor();
+            break;
+        case "crawl":
+            executor = new CrawlExecutor();
+            break;
+        default:
+        {
+            console.log("Unrecognized executor: " + executorName);
+            process.exit(-1);
+        }
+    }
+
+    var driver = MesosApi.createExecutorDriver(executor);
+
+    console.log("Running executor driver...");
+    driver.run()
+        .then(function (status) {
+            console.log("Executor driver finished with status: " + status);
+            process.exit(0);
+        })
+        .catch(function (error) {
+            console.log("Unexpected driver error: " + error);
+            process.exit(-3);
+        });
 }
 
 module.exports.main = main;

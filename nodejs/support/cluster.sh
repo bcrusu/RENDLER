@@ -4,8 +4,7 @@ SCRIPTDIR=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)
 
 CLUSTER_WORK_DIR=${SCRIPTDIR}/work
 RENDLER_OUTPUT_DIR=/tmp/rendlerout
-
-APPBUILDDIR=${SCRIPTDIR}/../src/main/mesosclr.Rendler/bin/Debug
+APPDIR=${SCRIPTDIR}/../
 
 copy_files() {
 	if [ ! -d "$CLUSTER_WORK_DIR" ]; then
@@ -20,9 +19,9 @@ copy_files() {
 	fi
 
 
-	#cd $APPBUILDDIR
-	#tar -czf ${CLUSTER_WORK_DIR}/rendler.tar.gz *
-	#cd -
+	cd $APPDIR
+	tar -czf ${CLUSTER_WORK_DIR}/rendler.tar.gz * --exclude='support*'
+	cd -
 }
 
 start_cluster() {

@@ -47,7 +47,7 @@ function CrawlExecutor() {
     }
 
     function sendCrawlResultMessage(driver, url, links) {
-        var message = new {
+        var message = {
             type: "CrawlResult",
             body: {
                 url: url,

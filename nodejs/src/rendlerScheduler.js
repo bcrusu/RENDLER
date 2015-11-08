@@ -1,6 +1,6 @@
 const util = require('util');
 const path = require('path');
-const MesosApi = require('mesosApi')(0);
+const MesosApi = require('mesos-api')(0);
 const Protos = MesosApi.protos.mesos;
 const EventEmitter = require('events');
 const ByteBuffer = require('bytebuffer');
@@ -79,12 +79,11 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
     }
 
     function onFrameworkMessage(driver, executorId, slaveId, data) {
-        var url = undefined;
         var message = JSON.parse(data);
+        var url = message.body.url;
 
         switch (message.type) {
             case "CrawlResult":
-                url = message.body.url;
                 var links = message.body.links;
                 console.log("Framework message 'CrawlResult': got " + links.length + " links from url " + url);
 
@@ -110,7 +109,6 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
                 });
                 break;
             case "RenderResult":
-                url = message.body.url;
                 var fileName = message.body.fileName;
                 console.log("Framework message 'RenderResult': saved " + fileName + " for url " + url);
 
@@ -146,7 +144,7 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
             executor: new Protos.ExecutorInfo({
                 executor_id: new Protos.ExecutorID({value: "RenderExecutor"}),
                 command: new Protos.CommandInfo({
-                    value: "mono rendler.exe -executor=render",  //TODO
+                    value: "node index.js -executor=render",
                     user: runAsUser,
                     uris: [
                         new Protos.CommandInfo.URI({
@@ -183,7 +181,7 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
             executor: new Protos.ExecutorInfo({
                 executor_id: new Protos.ExecutorID({value: "CrawlExecutor"}),
                 command: new Protos.CommandInfo({
-                    value: "mono rendler.exe -executor=crawl",  //TODO
+                    value: "node index.js -executor=crawl",
                     user: runAsUser,
                     uris: [
                         new Protos.CommandInfo.URI({

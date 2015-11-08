@@ -1,4 +1,4 @@
-const MesosApi = require('mesosApi')(0);
+const MesosApi = require('mesos-api')(0);
 const Protos = MesosApi.protos.mesos;
 
 exports.sendTaskRunningStatus = function (driver, taskId) {

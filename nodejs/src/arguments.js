@@ -62,12 +62,12 @@ function parse(argsArray) {
     });
 
     return {
-        'runMode': runMode,
-        'mesosMaster': mesosMaster,
-        'executorName': executor,
-        'outputDir': outputDir,
-        'startUrl': startUrl,
-        'runAsUser': runAsUser
+        runMode: runMode,
+        mesosMaster: mesosMaster,
+        executorName: executor,
+        outputDir: outputDir,
+        startUrl: startUrl,
+        runAsUser: runAsUser
     }
 }
 
