@@ -1,5 +1,5 @@
 var Arguments = require("./arguments");
-const MesosApi = require("mesos-api")(0);
+const MesosApi = require("mesos-api");
 const Protos = MesosApi.protos.mesos;
 const RendlerScheduler = require("./rendlerScheduler");
 const CrawlExecutor = require("./executors/crawlExecutor");

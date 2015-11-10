@@ -1,9 +1,10 @@
 const util = require('util');
 const path = require('path');
-const MesosApi = require('mesos-api')(0);
+const MesosApi = require('mesos-api');
 const Protos = MesosApi.protos.mesos;
 const EventEmitter = require('events');
 const ByteBuffer = require('bytebuffer');
+const dotUtil = require('./dotUtil');
 
 const MaxTasksToRun = 256; // limit for demonstration purpose
 const RenderCpus = 1;
@@ -73,7 +74,8 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
             console.log("Reached the max number of tasks to run. Stopping...");
 
             var dotWritePath = path.join(outputDir, "result.dot");
-            //TODO: write DOT file
+            dotUtil.write(dotWritePath, _crawlResults, _renderResults);
+
             driver.stop();
         }
     }
@@ -104,8 +106,7 @@ function RendlerScheduler(startUrl, outputDir, runAsUser) {
 
                 // empty edge list for links
                 links.forEach(function (link) {
-                    if (!(link in _crawlResults))
-                        _crawlResults[link] = [];
+                    _crawlResults[link] = _crawlResults[link] || [];
                 });
                 break;
             case "RenderResult":

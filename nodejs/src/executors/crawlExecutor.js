@@ -70,13 +70,24 @@ function CrawlExecutor() {
         }
     }
 
+    function getIsValidLink(link) {
+        try {
+            var protocol = urlLib.parse(link).protocol;
+            return protocol === "https:" || protocol === "http:";
+        }
+        catch (e) {
+            return false;
+        }
+    }
+
     function parseLinks(content) {
         var regex = /<a[^>]+href=[\"']?([^\"\'>]+)[\"\']?[^>]*>.+?<\/a>/gi;
         var links = [];
         var array;
         while ((array = regex.exec(content)) !== null) {
             var link = array[1];
-            links.push(link.toLowerCase());
+            if (getIsValidLink(link))
+                links.push(link.toLowerCase());
         }
 
         return links;
