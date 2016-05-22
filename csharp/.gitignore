@@ -3,9 +3,8 @@
 *.sdf
 *.userprefs
 .vs
-packages
-Rendler/bin
-Rendler/obj
-ext/mesosclr.dll
-ext/libmesosclr.so
-
+bin
+obj
+*.so
+*.nupkg
+*.lock.json
